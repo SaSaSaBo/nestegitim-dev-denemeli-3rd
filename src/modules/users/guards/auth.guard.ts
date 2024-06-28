@@ -37,19 +37,3 @@ export class AuthGuard implements CanActivate{
       }
     
 }
-
-        // return request.headers.authorization?.split(' ')[1]; from video is not working
-
-
-        // const [type, token] = request.headers.authorization?.split(' ') ?? [];
-        // return type === 'Bearer' ? token : undefined; from vsc is not working
-
-        // const authHeader = request.headers['authorization']; 
-        // if (!authHeader) {
-        //   return undefined;
-        // }
-        // const [bearer, token] = authHeader.split(' ');
-        // if (bearer !== 'Bearer' || !token) {
-        //   return undefined;
-        // }
-        // return token; from gpt is working

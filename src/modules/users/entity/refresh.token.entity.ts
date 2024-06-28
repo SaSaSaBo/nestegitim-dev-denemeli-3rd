@@ -13,6 +13,13 @@ export class RefreshTokenEntity {
     userId: number;
 
     @CreateDateColumn()
-    expiryDate: Date;
+    refreshTokenExpiryDate: Date;
+
+    @Column()
+    accessToken?: string;
+    
+    @Column()
+    accessTokenExpiryDate?: Date;
+    
 
 }

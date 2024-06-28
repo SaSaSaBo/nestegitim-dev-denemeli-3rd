@@ -113,7 +113,7 @@ export class UsersService {
         // Generate JWT tokens
         const tokens = await this.generateUserTokens(user); 
         console.log(tokens);
-        return { tokens };
+        return { tokens };        
       }
       throw new NotFoundException('Şifre veya kullanıcı adı hatalı!');
     } catch (error) {
@@ -351,23 +351,29 @@ export class UsersService {
     const accessToken = this.jwtService.sign({ username: user.username, sub: user.id});
     const refreshToken = uuidv4();
 
-    await this.storeRefreshToken(refreshToken, user.id);
+    await this.storeRefreshToken(refreshToken, accessToken, user.id);
     return { accessToken, refreshToken };
   }
 
-  async storeRefreshToken(refreshToken: string, userId: number) {
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 3);
+  async storeRefreshToken(accessToken: string, refreshToken: string, userId: number) {
+    const refreshTokenExpiryDate = new Date();
+    refreshTokenExpiryDate.setDate(refreshTokenExpiryDate.getDate() + 3);
+
+    const accessTokenExpiryDate = new Date();
+    accessTokenExpiryDate.setDate(accessTokenExpiryDate.getDate() + 3);
 
     await this.refreshTokenRepository.manager.save(RefreshTokenEntity, {
       refreshToken,
       userId,
-      expiryDate
+      accessToken,
+      accessTokenExpiryDate, // accessTokenExpiryDate'e expiryDate'i atayın
+      refreshTokenExpiryDate,
+  
     })
   } 
 
   async refreshTokens(refreshToken: string) {
-    const token = await this.refreshTokenRepository.findOne({ where: { refreshToken, expiryDate: MoreThanOrEqual(new Date()) } });
+    const token = await this.refreshTokenRepository.findOne({ where: { refreshToken, refreshTokenExpiryDate: MoreThanOrEqual(new Date()) } });
 
     if (!token) {
       throw new UnauthorizedException('Refresh token bulunamadı!');
