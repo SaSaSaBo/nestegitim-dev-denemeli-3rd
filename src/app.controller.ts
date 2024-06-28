@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { AppService } from './app.service';
 import { UserLoginDto } from './modules/users/dto/users.login.dto';
 import { AuthGuard } from './modules/users/guards/auth.guard';
 
@@ -16,7 +15,12 @@ export class AppController {
 
   @Get()
   someProtectedRoute(@Req() req) {
-    return {message: 'some protected route', userId: req.userId};
+    console.log(req.userId);
+    
+    return {
+      message: 'some protected route',
+      userId: req.userId,
+    };
   }
 
 }
