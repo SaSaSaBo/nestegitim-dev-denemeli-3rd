@@ -16,10 +16,10 @@ export class RefreshTokenEntity {
     refreshTokenExpiryDate: Date;
 
     @Column()
-    accessToken?: string;
+    accessToken: string;
     
     @Column()
-    accessTokenExpiryDate?: Date;
+    accessTokenExpiryDate: Date;
     
 
 }
