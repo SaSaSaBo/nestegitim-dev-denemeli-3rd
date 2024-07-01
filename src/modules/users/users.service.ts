@@ -132,7 +132,8 @@ export class UsersService {
             await this.logControlService.logAction(user.username, 'login');
 
             // Generate JWT tokens
-            const tokens = await this.generateUserTokens(user, this.jwtService.sign({ username: user.username, sub: user.id })); 
+            // const tokens = await this.generateUserTokens(user, this.jwtService.sign({ username: user.username, sub: user.id }));  actual one
+            const tokens = await this.generateUserTokens(user); 
             console.log(tokens);
             return { tokens };        
         }
@@ -368,26 +369,24 @@ export class UsersService {
         }
   }
 
-/*
+
   async generateUserTokens(user: UsersEntity) {
 
     const refreshToken = uuidv4();
-    const accessToken = this.jwtService.sign({ username: user.username, sub: user.id});
-
+    const accessToken = this.jwtService.sign({ username: user.username, sub: user.id}, { expiresIn: '2m' });
 
     await this.storeRefreshToken(refreshToken, accessToken, user.id);
     return { refreshToken, accessToken };
   }
-  This generateUserTokens method refreshing refreshToken and accessToken values  
 
-*/
-
+/*
   async generateUserTokens(user: UsersEntity, accessToken: string) {
     const refreshToken = uuidv4();
     await this.storeRefreshToken(refreshToken, accessToken, user.id);
     return { refreshToken, accessToken };
-  }
-
+  } 
+    This generateUserTokens method refreshing refreshToken and accessToken values  
+*/
 /*
   async storeRefreshToken( refreshToken: string, accessToken: string, userId: number) {
     const refreshTokenExpiryDate = new Date();
@@ -474,7 +473,9 @@ export class UsersService {
     if (!user) {
       throw new UnauthorizedException('Kullanıcı bulunamadı!');
     }
-    return this.generateUserTokens(user, token.accessToken);
+    return this.generateUserTokens(user);
+
+    // return this.generateUserTokens(user, token.accessToken); actual one
     // return this.generateUserTokens( await this.usersRepository.findOne({ where: { id: token.userId } }))
   }
 
