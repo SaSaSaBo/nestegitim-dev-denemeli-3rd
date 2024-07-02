@@ -15,5 +15,6 @@ export class AuthService {
   async logout(username: string): Promise<void> {
     // Your existing logout logic
     await this.logControlService.logAction(username, 'logout');
-  }
+  } 
+
 }

@@ -4,9 +4,9 @@ import { Type } from 'class-transformer';
 
 export class UserPasswordChangeDto {
 
-  @Type(() => Number)
-  @IsNumber()
-  id: number;
+  // @Type(() => Number)
+  // @IsNumber()
+  // id: number;
 
   @IsString()
   current_password: string;

@@ -25,6 +25,10 @@ import { AddUsersToCourseDto } from './dto/add.users.to.course.dto';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { RefreshTokenEntity } from './entity/refresh.token.entity';
+import { ForgotPasswordDto } from './dto/forgot.password.dto';
+import { ResetTokenEntity } from './entity/reset.token.entity';
+import { EmailService } from './service/email.service';
+
 
 @Injectable()
 export class UsersService {
@@ -42,24 +46,19 @@ export class UsersService {
     @InjectRepository(RefreshTokenEntity)
     private refreshTokenRepository: Repository<RefreshTokenEntity>,
 
+    @InjectRepository(ResetTokenEntity) 
+    private readonly resetRepository: Repository<ResetTokenEntity>,
+
     private passwordService:  PasswordService,
     private userlogService: UserlogService,
     private logControlService: LogControlService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   findAll() {
     return this.usersRepository.find();
   } 
-
-  async registerUser(username: string, password: string): Promise<UsersEntity> {
-    const hashedPassword = await this.passwordService.hashPassword(password);
-    const newUser = this.usersRepository.create({
-      username,
-      password: hashedPassword,
-    });
-    return await this.usersRepository.save(newUser);
-  }
 
   async register(data: UserRegisterDto): Promise<ResponseRegister> {
     try {
@@ -184,6 +183,7 @@ export class UsersService {
     return null;
   }
 
+/*
   async changepassword(data: UserPasswordChangeDto) {
     try {
       const { id, current_password, new_password, password_confirm } = data;
@@ -226,23 +226,85 @@ export class UsersService {
       throw error;
     }
   }
-  
-  async checkpassword(id: number, username: string, password: string): Promise<UsersEntity> {
-    try {
-      const user = await this.checkAuth(username, password);
-      if (user && user.id === id) {
-        return user;
-      } else {
-        throw new NotFoundException('Bilgiler yanlış!');
-      }
-    } catch (error) {
-      throw error;
+*/
+ 
+  async changepassword(userId: number, changePassword: UserPasswordChangeDto) {
+    // Find the user by ID
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('Kullanıcı bulunamadı!');
     }
+
+    // Compare the old password with the hashed password in the database
+    const isMatch = await bcrypt.compare(changePassword.current_password, user.password);
+    if (!isMatch) {
+      throw new ForbiddenException('Mevcut şifre yanlış!');
+    }
+
+    // Change user's password
+    const hashedPassword = await bcrypt.hash(changePassword.new_password, 10);
+    user.password = hashedPassword;
+    await this.usersRepository.save(user);
+
+    const log = new UserlogEntity();
+    log.info = `Şifre değiştirildi.`;
+    log.user = user;
+    await this.userlogService.addLog(log);
+
+    return {
+      statusCode: 200,
+      message: 'Şifre başarıyla güncellendi.',
+    };
   }
 
   async hashPassword(password: string): Promise<string> {
     const saltRounds = 10;
     return await bcrypt.hash(password, saltRounds);
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<{message: string}> {
+    // Check that the user exists
+    const user = await this.usersRepository.findOne({ where: { email: forgotPasswordDto.email } });
+
+    if (user) {
+      const resetTokenExpiryDate = new Date();
+      resetTokenExpiryDate.setHours(resetTokenExpiryDate.getHours() + 1);
+      // If user exists, generate a new password reset link
+
+      const resetToken = uuidv4();
+      await this.resetRepository.save({
+        userId: user.id, 
+        resetToken: resetToken, 
+        resetTokenExpiryDate 
+      });
+
+      // Send the link to the user by email (using nodemailer/ SES/ etc...)
+      this.emailService.sendPasswordResetEmail(user.email, resetToken);
+
+    }
+    return {message: "Sıfırlama linki e-posta adresinize gönderildi."};
+
+  }
+
+  async resetPassword(new_password: string, resetToken: string){
+    // Find the reset token document
+    const token = await this.resetRepository.findOne({ where: { resetToken, resetTokenExpiryDate: MoreThanOrEqual(new Date()) } });
+    if (!token) {
+      throw new NotFoundException('Sıfırlama kodu bulunamadı!');
+    }
+
+    // Change user password (MAKE SURE TO HASH) 
+    const user = await this.usersRepository.findOne({ where: { id: token.userId } });
+    if (!user) {
+      throw new NotFoundException('Kullanıcı bulunamadı!');
+    }
+
+    user.password = await this.hashPassword(new_password);
+    await this.usersRepository.save(user);
+    await this.resetRepository.remove(token);
+
+    return {message: "Sıfırlama işlemi tamamlandı."};
+
   }
 
   async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
@@ -369,16 +431,6 @@ export class UsersService {
         }
   }
 
-
-  async generateUserTokens(user: UsersEntity) {
-
-    const refreshToken = uuidv4();
-    const accessToken = this.jwtService.sign({ username: user.username, sub: user.id}, { expiresIn: '2m' });
-
-    await this.storeRefreshToken(refreshToken, accessToken, user.id);
-    return { refreshToken, accessToken };
-  }
-
 /*
   async generateUserTokens(user: UsersEntity, accessToken: string) {
     const refreshToken = uuidv4();
@@ -387,6 +439,16 @@ export class UsersService {
   } 
     This generateUserTokens method refreshing refreshToken and accessToken values  
 */
+
+  async generateUserTokens(user: UsersEntity) {
+
+    const refreshToken = uuidv4();
+    const accessToken = this.jwtService.sign({ username: user.username, sub: user.id}, { expiresIn: '3h' });
+
+    await this.storeRefreshToken(refreshToken, accessToken, user.id);
+    return { refreshToken, accessToken };
+  }
+
 /*
   async storeRefreshToken( refreshToken: string, accessToken: string, userId: number) {
     const refreshTokenExpiryDate = new Date();
