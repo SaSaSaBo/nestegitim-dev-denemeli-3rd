@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put, Req, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put, Req, SetMetadata, UseGuards, ValidationPipe } from '@nestjs/common';
 import { UserLoginDto } from './dto/users.login.dto';
 import { UsersService } from './users.service';
 import { UserRegisterDto } from './dto/users.register.dto';
@@ -10,6 +10,8 @@ import { RefreshDto } from './dto/refresh.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { ForgotPasswordDto } from './dto/forgot.password.dto';
 import { ResetPasswordDto } from './dto/reset.password.dto';
+import { Role } from './enum/role.enum';
+import { Roles } from './roles/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -18,6 +20,8 @@ export class UsersController {
   ) {}
 
   @Get()
+  // @SetMetadata('roles', [Role.ADMIN]) // custom decorator allows only admins to access this route. But we made a roles.decorator.ts file for roles. So instead of using that we gonna use:
+  @Roles(Role.ADMIN) //it's same as @SetMetadata('roles', [Role.ADMIN])
   async findAll() {
     return this.userService.findAll();
   }
@@ -40,6 +44,7 @@ export class UsersController {
   }
 
   @Post('add')
+   @Roles(Role.ADMIN)
   async addUserToCourses(@Body() addUsersToCourseDto: AddUsersToCourseDto) {
     return this.userService.addUserToCourses(addUsersToCourseDto);
   }
@@ -93,6 +98,7 @@ export class UsersController {
 */
 
   @Delete('delete/:id')
+  @Roles(Role.ADMIN)
   async deleteUser(@Body() deleteUserDto: UsersDeleteDto): Promise<{ message: string }> {  
     try {
       const message = await this.userService.delete(deleteUserDto);

@@ -5,22 +5,55 @@ import { UsersModule } from './modules/users/users.module';
 import { typeOrmDatabase } from './core/database';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { IpLoggerMiddleware } from './common/middleware/ip-logger/ip-logger.middleware';
-
 import { CoursesModule } from './modules/courses/courses.module';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { RoleGuard } from './modules/users/guards/role.guard';
+import { UsersService } from './modules/users/users.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersEntity } from './modules/users/users.entity';
+import { CoursesEntity } from './modules/courses/courses.entity';
+import { RefreshTokenEntity } from './modules/users/entity/refresh.token.entity';
+import { ResetTokenEntity } from './modules/users/entity/reset.token.entity';
+import { EmailService } from './modules/users/service/email.service';
+import { LogControlService } from './modules/logcontrol/logcontrol.service';
+import { UserlogService } from './modules/userlog/userlog.service';
+import { PasswordService } from './modules/users/password/password.service';
+import { UserlogEntity } from './modules/userlog/userlog.entity';
+import { LogcontrolEntity } from './modules/logcontrol/logcontrol.entity';
 
 @Module({
   imports: [
-    ...typeOrmDatabase, 
-    UsersModule, 
+    UsersModule,
     CoursesModule,
+    ...typeOrmDatabase, 
     JwtModule.register({
       global: true, 
       secret: 'cat'
     }),
+    TypeOrmModule.forFeature([
+      UsersEntity,
+      CoursesEntity,
+      RefreshTokenEntity,
+      ResetTokenEntity,
+      UserlogEntity,
+      LogcontrolEntity,
+    ]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    UsersService,
+    PasswordService,
+    UserlogService,
+    LogControlService,
+    JwtService,
+    EmailService,
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
+  ],
 })
 
 export class AppModule {

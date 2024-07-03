@@ -16,11 +16,28 @@ import { ResetTokenEntity } from './entity/reset.token.entity';
 import { EmailService } from './service/email.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersEntity,CoursesEntity, UserlogEntity, LogcontrolEntity, RefreshTokenEntity, ResetTokenEntity]), PasswordModule, 
+  imports: [
+    TypeOrmModule.forFeature([
+      UsersEntity,
+      CoursesEntity, 
+      UserlogEntity, 
+      LogcontrolEntity, 
+      RefreshTokenEntity, 
+      ResetTokenEntity
+    ]), 
+    PasswordModule, 
   ], 
 
   controllers: [UsersController],
-  providers: [UsersService, UserlogService, LogControlService, AuthService, CoursesService, EmailService],
+
+  providers: [
+    UsersService, 
+    UserlogService, 
+    LogControlService, 
+    AuthService, 
+    CoursesService, 
+    EmailService,
+  ],
 
 })
 export class UsersModule {}

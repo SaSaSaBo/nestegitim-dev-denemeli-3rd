@@ -1,7 +1,8 @@
 import { BaseEntity, Column, DeleteDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { CoursesEntity } from '../courses/courses.entity';
+import { Role } from './enum/role.enum';
 
-@Entity('users')
+@Entity('Users')
 export class UsersEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -19,6 +20,13 @@ export class UsersEntity extends BaseEntity {
   password: string;
   hashedPassword: string;
 
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: [Role.USER], 
+  })
+  roles: Role;
+
   @DeleteDateColumn({
     name: 'deleted_at',
     type: 'timestamp',
@@ -27,12 +35,12 @@ export class UsersEntity extends BaseEntity {
   })
   deletedAt: Date;
 
-  userId: any;
-
   @ManyToMany(() => CoursesEntity, (courses) => courses.users)
   @JoinTable({
     name: 'users_courses'
   })
   courses: CoursesEntity[]
+
+  userId: any;
   
 }

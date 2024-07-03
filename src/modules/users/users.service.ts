@@ -60,6 +60,10 @@ export class UsersService {
     return this.usersRepository.find();
   } 
 
+  findOneById(id: number) {
+    return this.usersRepository.findOneBy({ id });
+  }
+
   async register(data: UserRegisterDto): Promise<ResponseRegister> {
     try {
       const { password, password_confirm } = data;

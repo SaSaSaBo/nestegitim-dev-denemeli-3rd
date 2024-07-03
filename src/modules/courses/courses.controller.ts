@@ -2,6 +2,8 @@ import { CoursesService } from './courses.service';
 import { Body, Controller, Delete, HttpException, HttpStatus, Post } from '@nestjs/common';
 import { CoursesAddDto } from './dto/add.course.dto';
 import { CoursesDeleteDto } from './dto/delete.course.dto';
+import { Roles } from '../users/roles/roles.decorator';
+import { Role } from '../users/enum/role.enum';
 
 @Controller('courses')
 export class CoursesController {
@@ -10,11 +12,13 @@ export class CoursesController {
     ) {}
 
     @Post('add')
+    @Roles(Role.ADMIN)
     async add(@Body() data: CoursesAddDto) {
       return this.CoursesService.add(data);
     }  
 
     @Delete('delete/:id')
+    @Roles(Role.ADMIN)
     async deleteUser(@Body() coursesDeleteDto: CoursesDeleteDto): Promise<string> {  
       try {
         const message = await this.CoursesService.delete(coursesDeleteDto);

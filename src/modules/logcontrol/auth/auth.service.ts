@@ -3,6 +3,7 @@ import { LogControlService } from '../logcontrol.service';
 
 @Injectable()
 export class AuthService {
+
   constructor(
     private readonly logControlService: LogControlService,
   ) {}

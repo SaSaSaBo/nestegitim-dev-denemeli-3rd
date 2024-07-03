@@ -1,5 +1,6 @@
-import { IsEmail, IsPhoneNumber, IsString, MaxLength, MinLength, } from 'class-validator';
+import { IsArray, IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength, } from 'class-validator';
 import { UsersEntity } from '../users.entity';
+import { Role } from '../enum/role.enum';
 
 export class UserRegisterDto{
 
@@ -13,6 +14,11 @@ export class UserRegisterDto{
 
     @IsString()
     phone: string;
+
+    @IsOptional()
+    @IsArray()
+    @IsEnum(Role, { each: true })
+    roles?: Role;
 
     @MinLength(6)
     @MaxLength(10)
@@ -28,6 +34,7 @@ export class UserRegisterDto{
         user.username = this.username;
         user.email = this.email;
         user.phone = this.phone;
+        user.roles = this.roles;
         user.password = this.hashedPassword;
         return user;
     }
