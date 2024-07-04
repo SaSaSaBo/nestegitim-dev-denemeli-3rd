@@ -17,6 +17,10 @@ export class CoursesService {
 
     ) {}
 
+    findAll() {
+        return this.CRepository.find();
+    } 
+
     async addUserToCourse(courseId: number, userId: number): Promise<void> {
         const course = await this.CRepository.findOne({
           where: { id: courseId },

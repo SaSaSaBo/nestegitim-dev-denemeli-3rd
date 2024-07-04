@@ -8,7 +8,6 @@ import { IpLoggerMiddleware } from './common/middleware/ip-logger/ip-logger.midd
 import { CoursesModule } from './modules/courses/courses.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
-import { RoleGuard } from './modules/users/guards/role.guard';
 import { UsersService } from './modules/users/users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from './modules/users/users.entity';
@@ -22,6 +21,7 @@ import { PasswordService } from './modules/users/password/password.service';
 import { UserlogEntity } from './modules/userlog/userlog.entity';
 import { LogcontrolEntity } from './modules/logcontrol/logcontrol.entity';
 
+
 @Module({
   imports: [
     UsersModule,
@@ -29,7 +29,8 @@ import { LogcontrolEntity } from './modules/logcontrol/logcontrol.entity';
     ...typeOrmDatabase, 
     JwtModule.register({
       global: true, 
-      secret: 'cat'
+      secret: 'cat',
+      signOptions: { expiresIn: '6h' },
     }),
     TypeOrmModule.forFeature([
       UsersEntity,
@@ -49,10 +50,6 @@ import { LogcontrolEntity } from './modules/logcontrol/logcontrol.entity';
     LogControlService,
     JwtService,
     EmailService,
-    {
-      provide: APP_GUARD,
-      useClass: RoleGuard,
-    },
   ],
 })
 

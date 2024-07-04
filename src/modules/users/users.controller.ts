@@ -23,8 +23,9 @@ export class UsersController {
  
   @Get('findall')
   // @SetMetadata('roles', [Role.ADMIN]) 
-  @UseGuards(AuthGuard, RoleGuard)// custom decorator allows only admins to access this route. But we made a roles.decorator.ts file for roles. So instead of using that we gonna use:
-  @Roles(Role.USER) //it's same as @SetMetadata('roles', [Role.ADMIN])
+  @UseGuards(AuthGuard, RoleGuard)
+  // custom decorator allows only admins to access this route. But we made a roles.decorator.ts file for roles. So instead of using that we gonna use:
+  @Roles(Role.ADMIN) //it's same as @SetMetadata('roles', [Role.ADMIN])
   async findAll() {
     return this.userService.findAll();
   }
@@ -71,7 +72,7 @@ export class UsersController {
     return this.userService.update(id, data);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Put('changePassword/:id')
   async changepassword(
     @Body() changePasswordDto: UserPasswordChangeDto, 
@@ -101,6 +102,7 @@ export class UsersController {
 */
 
   @Delete('delete/:id')
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
   async deleteUser(@Body() deleteUserDto: UsersDeleteDto): Promise<{ message: string }> {  
     try {
