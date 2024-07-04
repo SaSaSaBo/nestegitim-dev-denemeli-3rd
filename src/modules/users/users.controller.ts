@@ -12,6 +12,7 @@ import { ForgotPasswordDto } from './dto/forgot.password.dto';
 import { ResetPasswordDto } from './dto/reset.password.dto';
 import { Role } from './enum/role.enum';
 import { Roles } from './roles/roles.decorator';
+import { RoleGuard } from './guards/role.guard';
 
 @Controller('users')
 export class UsersController {
@@ -19,9 +20,11 @@ export class UsersController {
     private userService: UsersService,
   ) {}
 
-  @Get()
-  // @SetMetadata('roles', [Role.ADMIN]) // custom decorator allows only admins to access this route. But we made a roles.decorator.ts file for roles. So instead of using that we gonna use:
-  @Roles(Role.ADMIN) //it's same as @SetMetadata('roles', [Role.ADMIN])
+ 
+  @Get('findall')
+  // @SetMetadata('roles', [Role.ADMIN]) 
+  @UseGuards(AuthGuard, RoleGuard)// custom decorator allows only admins to access this route. But we made a roles.decorator.ts file for roles. So instead of using that we gonna use:
+  @Roles(Role.USER) //it's same as @SetMetadata('roles', [Role.ADMIN])
   async findAll() {
     return this.userService.findAll();
   }

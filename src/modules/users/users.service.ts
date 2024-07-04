@@ -56,6 +56,7 @@ export class UsersService {
     private emailService: EmailService,
   ) {}
 
+  
   findAll() {
     return this.usersRepository.find();
   } 
@@ -448,7 +449,7 @@ export class UsersService {
   async generateUserTokens(user: UsersEntity) {
 
     const refreshToken = uuidv4();
-    const accessToken = this.jwtService.sign({ username: user.username, sub: user.id}, { expiresIn: '3h' });
+    const accessToken = this.jwtService.sign({ username: user.username, sub: user.id, role: user.roles}, { expiresIn: '3h' });
 
     await this.storeRefreshToken(refreshToken, accessToken, user.id);
     return { refreshToken, accessToken };
