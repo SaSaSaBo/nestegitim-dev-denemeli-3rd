@@ -6,8 +6,6 @@ import { UsersService } from "../users.service";
 @Injectable()
 export class RoleGuard implements CanActivate {
 
-
-
     constructor(
         private reflector: Reflector,
         private usersService: UsersService,
@@ -15,8 +13,8 @@ export class RoleGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
 
-    console.log('RolesGuard çalışıyor...');
-  
+        console.log('RolesGuard çalışıyor...');
+
         try {
 
             const requiredRoles = this.reflector.getAllAndOverride<Role[]>(
@@ -27,7 +25,7 @@ export class RoleGuard implements CanActivate {
                 ]
             );
 
-            console.log('---> Required Roles:', requiredRoles);
+
 
             if (!requiredRoles) {
                 return true; // Eğer gerekli roller belirtilmemişse izin ver
@@ -36,10 +34,6 @@ export class RoleGuard implements CanActivate {
             const request = context.switchToHttp().getRequest();
             const userId = request.userId; // Kullanıcı kimliğini al, bu genellikle authentication middleware tarafından sağlanır
     
-            
-            // console.log(request);    
-
-            console.log("User: " + userId);
         
 
             const user = await this.usersService.findOneById(userId); // Kullanıcıyı veritabanından bul
@@ -47,8 +41,7 @@ export class RoleGuard implements CanActivate {
                 return false; // Kullanıcı yoksa izin verme
             }
 
-            console.log('User:', user);
-            
+
 
             // Kullanıcının rollerini kontrol et
             return requiredRoles.some(role => user.roles.includes(role));

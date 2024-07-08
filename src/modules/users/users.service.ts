@@ -65,6 +65,10 @@ export class UsersService {
     return this.usersRepository.findOneBy({ id });
   }
 
+  // findOneByUsername(username: string) {
+  //   return this.usersRepository.findOneBy({ username })
+  // }
+
   async register(data: UserRegisterDto): Promise<ResponseRegister> {
     try {
       const { password, password_confirm } = data;
@@ -93,6 +97,7 @@ export class UsersService {
         .catch((e) => {
           throw new InternalServerErrorException(e.message || e);
         });
+
     } catch (error) {
       throw error;
     }
@@ -404,7 +409,7 @@ export class UsersService {
     }
   }
 
-  async delete(deleteUserDto: UsersDeleteDto): Promise<string> {
+  async delete(id, deleteUserDto: UsersDeleteDto): Promise<string> {
       const { username, current_password, password_confirm } = deleteUserDto;
       try {
         const user = await this.usersRepository.findOne({ where: { username, deletedAt: null } });
@@ -449,7 +454,13 @@ export class UsersService {
   async generateUserTokens(user: UsersEntity) {
 
     const refreshToken = uuidv4();
-    const accessToken = this.jwtService.sign({ username: user.username, sub: user.id, role: user.roles}, { expiresIn: '3h' });
+    const accessToken = this.jwtService.sign({ 
+      username: user.username, 
+      sub: user.id, 
+      role: user.roles,
+      permissions: user.permissions
+    }, 
+    { expiresIn: '3h' });
 
     await this.storeRefreshToken(refreshToken, accessToken, user.id);
     return { refreshToken, accessToken };

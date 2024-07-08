@@ -23,7 +23,7 @@ export class UsersEntity extends BaseEntity {
   @Column({
     type: 'enum',
     enum: Role,
-    default: [Role.USER], 
+    default: [Role.User], 
   })
   roles: Role;
 
@@ -42,5 +42,6 @@ export class UsersEntity extends BaseEntity {
   courses: CoursesEntity[]
 
   userId: any;
+  permissions: any;
   
 }

@@ -22,4 +22,6 @@ export class CoursesEntity {
     @JoinTable({ name: 'users_courses' })
     users: UsersEntity[];
 
+    isAdded: boolean;
+
 }
