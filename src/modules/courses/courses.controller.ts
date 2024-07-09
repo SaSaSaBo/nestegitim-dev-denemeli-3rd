@@ -7,7 +7,7 @@ import { Permissions } from '../users/decorator/permissions.decorator';
 import { Role } from '../users/enum/role.enum';
 import { RoleGuard } from '../users/guards/role.guard';
 import { AuthGuard } from '../users/guards/auth.guard';
-import { PermissionGuard } from '../permission/permission.guard';
+import { PermissionGuard } from '../users/guards/permission.guard';
 
 
 @Controller('courses')

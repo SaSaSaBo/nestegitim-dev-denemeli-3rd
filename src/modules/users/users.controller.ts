@@ -14,7 +14,7 @@ import { Role } from './enum/role.enum';
 import { Roles } from './decorator/roles.decorator';
 import { Permissions } from './decorator/permissions.decorator';
 import { RoleGuard } from './guards/role.guard';
-import { PermissionGuard } from '../permission/permission.guard';
+import { PermissionGuard } from './guards/permission.guard';
 
 @Controller('users')
 export class UsersController {

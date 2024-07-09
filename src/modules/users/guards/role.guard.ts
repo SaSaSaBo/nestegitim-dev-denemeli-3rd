@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/commo
 import { Reflector } from "@nestjs/core";
 import { Role } from "../enum/role.enum";
 import { UsersService } from "../users.service";
+import { log } from "console";
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -25,7 +26,7 @@ export class RoleGuard implements CanActivate {
                 ]
             );
 
-
+            console.log('Required roles:', requiredRoles);
 
             if (!requiredRoles) {
                 return true; // Eğer gerekli roller belirtilmemişse izin ver
@@ -41,7 +42,8 @@ export class RoleGuard implements CanActivate {
                 return false; // Kullanıcı yoksa izin verme
             }
 
-
+            console.log('User:', user);
+            
 
             // Kullanıcının rollerini kontrol et
             return requiredRoles.some(role => user.roles.includes(role));

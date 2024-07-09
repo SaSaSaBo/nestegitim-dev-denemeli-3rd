@@ -23,5 +23,5 @@ export const roles = {
         'update_own_profile', 
         'delete_own_profile'
     ],
-  };
-  
+};
+   

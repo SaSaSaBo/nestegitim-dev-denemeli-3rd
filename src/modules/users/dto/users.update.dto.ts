@@ -1,5 +1,6 @@
-import { IsEmail, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength, } from 'class-validator';
+import { IsArray, IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength, } from 'class-validator';
 import { UsersEntity } from "../users.entity";
+import { Role } from '../enum/role.enum';
 
 export class UserUpdateDto {
 
@@ -20,6 +21,11 @@ export class UserUpdateDto {
 
     @IsOptional()
     phone?: string;
+
+    @IsOptional()
+    @IsArray()
+    @IsEnum(Role, { each: true })
+    role?: Role;
 
     @MinLength(6)
     @MaxLength(10)

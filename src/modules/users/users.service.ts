@@ -372,6 +372,11 @@ export class UsersService {
         log.info = log.info ? `${log.info} Telefon numarası güncellendi.` : 'Telefon numarası güncellendi.';
       }
 
+      if (data.role && data.role !== user.roles) {
+        updateMessages.push('Kullanıcı rolü değiştirildi!');
+        log.info = log.info ? `${log.info} Kullanıcı rolü değiştirildi!` : 'Kullanıcı rolü değiştirildi!';
+      }
+
       if (data.current_password) {
         const res = await this.passwordService.comparePassword(data.current_password, user.password);
         if (res !== true) {
@@ -392,6 +397,7 @@ export class UsersService {
         username: data.new_username || user.username, 
         email: data.email || user.email, 
         phone: data.phone || user.phone, 
+        roles: data.role || user.roles,
         password: hashedPassword 
       };
       await this.usersRepository.save(updatedUser);
